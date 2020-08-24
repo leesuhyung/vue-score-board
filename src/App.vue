@@ -1,18 +1,38 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <button type="button" @click="addDocuments">addDocuments</button>
+
+    {{ documents }}
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import { db } from '@/firebase/db';
 
 export default {
-  name: "App",
-  components: {
-    HelloWorld
-  }
+  name: 'App',
+  data() {
+    return {
+      documents: [],
+    };
+  },
+  firebase: {
+    documents: db.ref('documents'),
+  },
+  methods: {
+    addDocuments() {
+      this.$firebaseRefs.documents.push({
+        name: 'test',
+        data: [
+          {
+            key1: 'foo',
+            key2: 'bar',
+          },
+        ],
+      });
+    },
+  },
 };
 </script>
 
