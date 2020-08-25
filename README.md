@@ -1,4 +1,4 @@
-# vue-pwa
+# vue-score-board
 
 ## Project setup
 ```
