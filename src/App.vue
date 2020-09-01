@@ -7,7 +7,7 @@
       <v-spacer />
       <v-menu offset-y>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn text v-on="on" v-bind="attrs">
+          <v-btn text v-bind="attrs" v-on="on">
             <v-icon small dense>mdi-flag</v-icon>
             {{ $store.state.season.title }}
           </v-btn>
@@ -81,7 +81,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="player in players" :key="player.id">
+                    <tr v-for="player in $store.state.players" :key="player.id">
                       <td>{{ player.id }}</td>
                       <td>{{ player.name }}</td>
                       <td>{{ player.teamId }}</td>
@@ -100,9 +100,7 @@
                         <v-btn
                           x-small
                           color="error"
-                          @click="
-                            $firestoreRefs.players.doc(player.id).delete()
-                          "
+                          @click="$store.dispatch('deletePlayer', player.id)"
                           >delete</v-btn
                         >
                       </td>
@@ -122,11 +120,11 @@
         <v-dialog v-model="dialog" max-width="400">
           <v-card>
             <v-form>
-              <v-text-field label="name" v-model="player.name" />
-              <v-text-field label="teamId" v-model="player.teamId" />
-              <v-text-field label="tier" v-model="player.tier" />
-              <v-text-field label="tribe" v-model="player.tribe" />
-              <v-text-field label="role" v-model="player.role" />
+              <v-text-field v-model="player.name" label="name" />
+              <v-text-field v-model="player.teamId" label="teamId" />
+              <v-text-field v-model="player.tier" label="tier" />
+              <v-text-field v-model="player.tribe" label="tribe" />
+              <v-text-field v-model="player.role" label="role" />
             </v-form>
             <v-card-actions>
               <v-spacer />
@@ -150,12 +148,11 @@ const players = db.collection('players');
 export default {
   name: 'App',
   data: () => ({
-    players: [],
     player: {},
     dialog: false,
   }),
-  firestore: {
-    players: players,
+  created() {
+    this.$store.dispatch('bindPlayers');
   },
   methods: {
     setSeason(season) {
@@ -166,7 +163,7 @@ export default {
       this.dialog = true;
     },
     async addPlayer() {
-      this.$firestoreRefs.players.add(Object.assign(this.player));
+      await this.$store.dispatch('addPlayer', this.player);
       this.dialog = false;
     },
     async bindPlayer(player) {
